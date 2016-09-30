@@ -1,0 +1,4 @@
+rootProject.name = 'ms-zone'
+include 'core', 'zone'
+
+
