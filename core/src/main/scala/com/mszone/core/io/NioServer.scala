@@ -24,9 +24,11 @@ class NioServer(hostAddress:InetAddress, port:Int) extends Thread with Log {
           iterator.remove()
           if (key.isAcceptable) {
             accept(key, selector)
-          } else if (key.isReadable) {
+          }
+          if (key.isReadable) {
             read(key, selector)
-          } else if (key.isWritable) {
+          }
+          if (key.isWritable) {
             write(key, selector)
           }
         }
@@ -46,20 +48,18 @@ class NioServer(hostAddress:InetAddress, port:Int) extends Thread with Log {
     val serverSocketChannel = key.channel().asInstanceOf[ServerSocketChannel]
     val socketChannel = serverSocketChannel.accept()
     socketChannel.configureBlocking(false)
-    socketChannel.register(selector, SelectionKey.OP_READ, new NioHandler())
+    socketChannel.register(selector, socketChannel.validOps(), new NioHandler())
   }
 
   private[this] def write(key: SelectionKey, selector: Selector) : Unit = {
     if (key.attachment() != null) {
       key.attachment().asInstanceOf[NioHandler].send(key.channel().asInstanceOf[SocketChannel])
     }
-    key.interestOps(SelectionKey.OP_READ)
   }
 
   private[this] def read(key: SelectionKey, selector: Selector) : Unit = {
     if (key.attachment() != null) {
       key.attachment().asInstanceOf[NioHandler].receive(key.channel().asInstanceOf[SocketChannel])
     }
-    key.interestOps(SelectionKey.OP_WRITE)
   }
 }

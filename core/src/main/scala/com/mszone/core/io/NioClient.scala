@@ -26,9 +26,11 @@ class NioClient (hostAddress:InetAddress, port:Int) extends Thread with Log {
           iterator.remove()
           if (key.isConnectable) {
             connect(key, selector)
-          } else if (key.isReadable) {
+          }
+          if (key.isReadable) {
             read(key, selector)
-          } else if (key.isWritable) {
+          }
+          if (key.isWritable) {
             write(key, selector)
           }
         }
@@ -47,7 +49,7 @@ class NioClient (hostAddress:InetAddress, port:Int) extends Thread with Log {
   private[this] def connect(key: SelectionKey, selector: Selector) : Unit = {
     try {
       key.channel().asInstanceOf[SocketChannel].finishConnect()
-      key.interestOps(SelectionKey.OP_WRITE)
+      key.interestOps(key.channel().validOps())
     } catch {
       case e: Exception =>
         println("exception caught: " + e)
@@ -57,11 +59,9 @@ class NioClient (hostAddress:InetAddress, port:Int) extends Thread with Log {
 
   private[this] def write(key: SelectionKey, selector: Selector) : Unit = {
     nioHandler.send(key.channel().asInstanceOf[SocketChannel])
-    key.interestOps(SelectionKey.OP_READ)
   }
 
   private[this] def read(key: SelectionKey, selector: Selector) : Unit = {
     nioHandler.receive(key.channel().asInstanceOf[SocketChannel])
-    key.interestOps(SelectionKey.OP_WRITE)
   }
 }
