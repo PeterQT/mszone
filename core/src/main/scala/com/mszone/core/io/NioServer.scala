@@ -48,18 +48,18 @@ class NioServer(hostAddress:InetAddress, port:Int) extends Thread with Log {
     val serverSocketChannel = key.channel().asInstanceOf[ServerSocketChannel]
     val socketChannel = serverSocketChannel.accept()
     socketChannel.configureBlocking(false)
-    socketChannel.register(selector, socketChannel.validOps(), new NioHandler())
+    socketChannel.register(selector, socketChannel.validOps(), new NioTransporter())
   }
 
   private[this] def write(key: SelectionKey, selector: Selector) : Unit = {
     if (key.attachment() != null) {
-      key.attachment().asInstanceOf[NioHandler].send(key.channel().asInstanceOf[SocketChannel])
+      key.attachment().asInstanceOf[NioTransporter].send(key.channel().asInstanceOf[SocketChannel])
     }
   }
 
   private[this] def read(key: SelectionKey, selector: Selector) : Unit = {
     if (key.attachment() != null) {
-      key.attachment().asInstanceOf[NioHandler].receive(key.channel().asInstanceOf[SocketChannel])
+      key.attachment().asInstanceOf[NioTransporter].receive(key.channel().asInstanceOf[SocketChannel])
     }
   }
 }

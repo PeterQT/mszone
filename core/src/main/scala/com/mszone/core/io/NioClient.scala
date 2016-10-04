@@ -7,7 +7,7 @@ import java.nio.channels.spi.SelectorProvider
 import com.mszone.core.log.Log
 
 class NioClient (hostAddress:InetAddress, port:Int) extends Thread with Log {
-  val nioHandler: NioHandler = new NioHandler()
+  val nioTransporter: NioTransporter = new NioTransporter()
   var active = false
 
   override def run(): Unit = {
@@ -58,10 +58,10 @@ class NioClient (hostAddress:InetAddress, port:Int) extends Thread with Log {
   }
 
   private[this] def write(key: SelectionKey, selector: Selector) : Unit = {
-    nioHandler.send(key.channel().asInstanceOf[SocketChannel])
+    nioTransporter.send(key.channel().asInstanceOf[SocketChannel])
   }
 
   private[this] def read(key: SelectionKey, selector: Selector) : Unit = {
-    nioHandler.receive(key.channel().asInstanceOf[SocketChannel])
+    nioTransporter.receive(key.channel().asInstanceOf[SocketChannel])
   }
 }

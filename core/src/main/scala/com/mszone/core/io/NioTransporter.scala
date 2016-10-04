@@ -6,7 +6,7 @@ import java.util.concurrent._
 
 import com.mszone.core.log.Log
 
-class NioHandler extends Log {
+class NioTransporter extends Log {
   private val readQueue = new ConcurrentLinkedQueue[String]()
   private val writeQueue = new ConcurrentLinkedQueue[String]()
   private val buffer = ByteBuffer.allocateDirect(50*1024)
@@ -26,7 +26,7 @@ class NioHandler extends Log {
         size = buffer.getInt()
         readSize = 0
       }
-      if (size > 0 && size <= maxMessageSize) {
+      if (buffer.remaining() > 0 && size > 0 && size <= maxMessageSize) {
         if (messageBuffer == null) {
           messageBuffer = new Array[Byte](size)
         }
@@ -66,4 +66,5 @@ class NioHandler extends Log {
     readQueue.add(new String(messageBuffer, "utf-8"))
     messageBuffer = null
   }
+
 }
